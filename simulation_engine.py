@@ -10,7 +10,14 @@ class SimulationEngine:
         if data_path is None:
             data_path = os.path.join(os.path.dirname(__file__), 'nassau_candy_data.csv')
             
-        self.model = joblib.load(model_path)
+        try:
+            self.model = joblib.load(model_path)
+        except Exception as e:
+            print(f"Model load failed (likely version mismatch). Retraining... Error: {e}")
+            from train_pipeline import train_and_evaluate
+            train_and_evaluate()
+            self.model = joblib.load(model_path)
+            
         self.df = pd.read_csv(data_path)
         
         self.factories = [
